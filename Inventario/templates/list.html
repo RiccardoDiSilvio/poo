@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Inventario</title>
+        {% csrf_token %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script>
+            function selectedProduct() {
+                var select = document.getElementById('options');
+                var chosen = select.value;
+                var products = document.getElementById('products');
+                var opt = document.createElement('li');
+                var inputVal = document.getElementById("numProds").value;
+                if (inputVal > 0){
+                    opt.innerHTML = chosen + ' ' + inputVal;
+                    opt.value = chosen + ' ' + inputVal;
+                    opt.name = chosen + ' ' + inputVal;
+                    products.appendChild(opt);
+                    document.getElementById('options').value = '';
+                    document.getElementById('numProds').value = 0;
+                }else{
+                    alert('Cantidad invalida');
+                } 
+            }
+
+            function createCart(){
+                var lista = document.getElementById("products");
+                var itemsLista = lista.getElementsByTagName("li");
+                listProd = [];
+                for (var i = 0; i < itemsLista.length; i++){
+                    listProd.push(itemsLista[i].innerText);
+                }
+                var request = new XMLHttpRequest();
+                console.log(listProd);
+                request.open('GET', '/cart/?products=' + listProd.toString(), false);
+                request.send();
+                console.log(request.status);
+                console.log(request.statusText);
+                alert("Venta registrada");
+                window.location.pathname = '/admin/';
+            }
+        </script>
+
+        <style>
+            body {background-color: powderblue;}
+            #options   {color: blue; margin: 10px;}
+            #numProds  {color: red; margin: 10px;}
+            </style>
+            </head>
+        <body>
+    <form action="/cart/" method="POST">
+        <legend>Añadir productos</legend>
+        <input list="choices" id="options" name="choice"> 
+        <datalist id="choices"> 
+            {% for product in products %}
+                <option>{{ product }}</option>
+            {% endfor %}
+        </datalist> 
+        <input id="numProds" type="number" name="quantity">
+        <br><br>
+    </form>
+
+    <button type="button" onclick="selectedProduct()">Add an option</button>
+
+
+    <ul id='products'>
+    </ul>
+
+    <button type="button" onclick="createCart()">Submit form</button>
+    
+    <p id="success"></p>
+</body>
+
+</html>
